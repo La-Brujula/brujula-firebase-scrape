@@ -10,7 +10,7 @@ const server = axios.create({
   timeout: 1000,
   headers: {
     Authorization:
-      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRwYWxtZUBtZS5jb20iLCJyb2xlIjoiYWRtaW4iLCJQcm9maWxlSWQiOiJjNThiOWI2Mi1kMDkzLTRhYWYtODI0Ni1iNmIzYWYxYzc1MTEiLCJpYXQiOjE3MDgwNDM1ODAsImV4cCI6MTcwODA0NzE4MH0.5a9yJCL6DlI3LhzDvRjrZRgwFpbQ0CuCQfsjdYYP-IA',
+      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdC53dWNrZXJ0MTJAaG90bWFpbC5jb20iLCJyb2xlIjoidXNlciIsIlByb2ZpbGVJZCI6IjA2NDdmN2E5LTRhNDItNDBkYi1iMjA3LWRjN2NjZGRiNjBhMyIsImlhdCI6MTcwODA3MjQ2OSwiZXhwIjoxNzA4MDc2MDY5fQ.esd4k05yCp9DHQ3MiKwjdl5LcEC7r0UnQQfytr1kw_c',
   },
 });
 
@@ -34,7 +34,6 @@ async function getOrCreateUser(userProfile: (typeof contacts)[0]) {
 async function createUser(userProfile: (typeof contacts)[0]) {
   if (userProfile.email === undefined) return;
   if (userProfile.type !== 'moral' && userProfile.type !== 'fisica') return;
-  // console.log(userProfile.email);
 
   const userId = (await getOrCreateUser(userProfile)).id;
 
@@ -72,11 +71,13 @@ async function createUser(userProfile: (typeof contacts)[0]) {
           : ['basic', 'intermediate', 'advanced', 'native'][lang.proficiency],
     })),
     gender:
-      userProfile.gender === 'male'
+      userProfile.gender === 'Masculino'
         ? 'male'
-        : userProfile.gender === 'female'
+        : userProfile.gender === 'Femenino'
         ? 'female'
-        : userProfile.gender === 'other'
+        : ['Persona Moral', 'No binario', 'Prefiero no decir'].includes(
+            userProfile.gender
+          )
         ? 'other'
         : undefined,
     workRadius:
@@ -141,6 +142,8 @@ async function addRecordsToDatabase() {
     try {
       await createUser(user);
     } catch (e) {
+      console.error(e);
+
       usersNotAdded.push(
         `${user.email!} ${JSON.stringify(
           (e! as { response: { data: { errors: object } } }).response!.data!
